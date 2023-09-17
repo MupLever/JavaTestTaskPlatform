@@ -1,20 +1,34 @@
-def combination(sum, vals):
-    for i in range(len(vals)):
-        cur_sum = 0
-        suggestion = []
-        for j in range(i, len(vals)):
-            if cur_sum + vals[j] <= sum:
-                cur_sum += vals[j]
-                suggestion.append(vals[j])
-        if sum == cur_sum:
-            return suggestion
-    return []
-    
-required_amount = int(input().split(' ')[0])
+from typing import List
 
-vals = sorted(list(filter(lambda x: x <= required_amount, map(int, input().split(' ')))) * 2, reverse=True)
+class Solution:
+    def best_combination(self, required_amount: int, vals: List[int]) -> List[int]:
+        def rbinsearch(l: int, r: int, current_sum) -> int:
+            while l < r:
+                m = (l + r + 1) // 2
+                if current_sum + vals[m] <= required_amount:
+                    l = m
+                else:
+                    r = m - 1
+            return l
 
-resulting_combination = combination(required_amount, vals)
+        for left in range(len(vals)):
+            cur_sum = 0
+            suggestion = []
+            right = len(vals)
+            while left < right:
+                right = rbinsearch(left, right - 1, cur_sum)
+                cur_sum += vals[right]
+                suggestion.append(vals[right])
+                if required_amount == cur_sum:
+                    return suggestion
+        return []
+
+required_amount, _ = map(int, input().split(' '))
+vals = sorted(list(map(int, input().split(' '))) * 2)
+
+solution = Solution()
+
+resulting_combination = solution.best_combination(required_amount, vals)
 
 if resulting_combination:
     print(len(resulting_combination))
